@@ -1,6 +1,7 @@
 {
   "name": "nothanks-gym",
   "version": "0.1.0",
+  "homepage": "https://sonjh02.github.io/nothanks-gym/",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",

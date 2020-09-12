@@ -1,3 +1,5 @@
+const io = require('./socket')
+
 const createDeck = () => {
   const deck = Array(33)
     .fill()
@@ -15,15 +17,30 @@ const state = {
   deck: null,
   open: 0,
   coin: 0,
-  turn: 0,
+  turn: -1,
+  waiting: '',
 }
 
 const mutator = {
   addPlayer: (client, name) => {
-    state.players = [...state.players, { client, name }]
+    if (!state.deck) {
+      const nameIdx = state.players.findIndex(p => p.name == name)
+      const cidIdx = state.players.findIndex(p => p.client.id == client.id)
+      if (cidIdx != -1) {
+        state.players[cidIdx] = { client, name }
+      } else if (nameIdx != -1) {
+        state.players[nameIdx] = { client, name }
+      } else {
+        state.players = [...state.players, { client, name }]
+      }
+      return true
+    }
+    return false
   },
   removePlayer: cid => {
-    state.players = state.players.filter(({ client }) => cid != client.id)
+    if (!state.deck) {
+      state.players = state.players.filter(({ client }) => cid != client.id)
+    }
   },
   startGame: () => {
     const n = state.players.length
@@ -32,7 +49,7 @@ const mutator = {
     state.deck = createDeck()
     state.open = 0
     state.coin = 0
-    state.players = players.map(({ client, name }) => ({
+    state.players = state.players.map(({ client, name }) => ({
       client,
       name,
       hand: [],
@@ -50,6 +67,7 @@ const mutator = {
   },
   playChip: () => {
     state.players[state.turn].coin -= 1
+    state.coin += 1
   },
   nextTurn: () => {
     state.turn += 1
@@ -58,8 +76,24 @@ const mutator = {
     }
   },
   finishGame: () => {
+    io.emit(
+      'game_report',
+      state.players.map(({ client, hand, coin, name }) => ({
+        cid: client.id,
+        hand,
+        coin,
+        name,
+      })),
+    )
+    state.waiting = ''
     state.deck = null
+    state.turn = -1
+    state.players = []
+  },
+  setWaiting: cid => {
+    state.waiting = cid
   },
 }
 
-module.exports = selector => selector({ ...state, ...mutator })
+module.exports = selector =>
+  selector ? selector({ ...state, ...mutator }) : { ...state, ...mutator }

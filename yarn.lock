@@ -11300,8 +11300,3 @@ yeast@0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/yeast/-/yeast-0.1.2.tgz#008e06d8094320c372dbc2f8ed76a0ca6c8ac419"
   integrity sha1-AI4G2AlDIMNy28L47XagymyKxBk=
-
-zustand@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.1.1.tgz#c48d7d4f612aa0e4c64568db931645f179e6275b"
-  integrity sha512-VypPwGrcmUp0gjdKiW2W+RzcPSKl8VYBiP1QxAX0AsiSTh7M2al6+8zWxnWNSem+Z6gqPN3anNp12q+1MiH32w==

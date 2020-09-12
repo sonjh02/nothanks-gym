@@ -1,3 +1,5 @@
+const io = require('./socket')
+
 exports.game = () =>
   io.emit(
     'game-update',
@@ -9,4 +11,5 @@ exports.game = () =>
       turn,
     })),
   )
+
 exports.conn = () => io.emit('conn-update')

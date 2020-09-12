@@ -1,4 +1,4 @@
-const io = require('socket.io')(3001)
+const io = require('./socket')
 const useStore = require('./store')
 const inform = require('./inform')
 const stamp = require('./stamp')
@@ -27,6 +27,7 @@ io.on('connection', client => {
   })
 
   client.on('clients', cb => {
+    stamp('Client List Requested:', client.id)
     io.clients((err, clients) => {
       const players = useStore(s => s.players)
       cb(

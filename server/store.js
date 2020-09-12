@@ -18,58 +18,48 @@ const state = {
   turn: 0,
 }
 
-module.exports.store = store
-module.exports.addPlayer = (client, name) => {
+const mutator = {
+  addPlayer: (client, name) => {
     state.players = [...state.players, { client, name }]
+  },
+  removePlayer: cid => {
+    state.players = state.players.filter(({ client }) => cid != client.id)
+  },
+  startGame: () => {
+    const n = state.players.length
+    const player_coin = n < 6 ? 11 : n > 6 ? 7 : 6
+    state.turn = Math.floor(Math.random() * n)
+    state.deck = createDeck()
+    state.open = 0
+    state.coin = 0
+    state.players = players.map(({ client, name }) => ({
+      client,
+      name,
+      hand: [],
+      coin: player_coin,
+    }))
+  },
+  flipCard: () => {
+    state.open = state.deck.pop()
+  },
+  takeCard: () => {
+    state.players[state.turn].hand.push(state.open)
+    state.players[state.turn].coin += state.coin
+    state.open = 0
+    state.coin = 0
+  },
+  playChip: () => {
+    state.players[state.turn].coin -= 1
+  },
+  nextTurn: () => {
+    state.turn += 1
+    if (state.turn >= state.players.length) {
+      state.turn = 0
+    }
+  },
+  finishGame: () => {
+    state.deck = null
+  },
 }
-module.exports.removePlayer: cid =>
-  set(({ players }) => ({
-    players: players.filter(({ client }) => cid != client.id),
-  }))
 
-/*
-
-module.exports = require('zustand').default(set => ({
-  ,
-  startGame: () =>
-    set(({ players }) => {
-      const n = players.length
-      const coin = n < 6 ? 11 : n > 6 ? 7 : 6
-      const turn = Math.floor(Math.random() * n)
-      const deck = createDeck()
-      return {
-        turn,
-        open: 0,
-        coin: 0,
-        players: players.map(({ client, name }) => ({
-          client,
-          name,
-          hand: [],
-          coin,
-        })),
-      }
-    }),
-  flipCard: () =>
-    set(({ deck }) => {
-      const open = deck.pop()
-      return { deck, open }
-    }),
-  takeCard: () =>
-    set(({ players, turn, open, coin }) => {
-      players[turn].hand.push(open)
-      players[turn].coin += coin
-      return { players, open: 0, coin: 0 }
-    }),
-  playChip: () =>
-    set(({ players, turn, coin }) => {
-      players[turn].coin -= 1
-      return { players, coin: coin + 1 }
-    }),
-  nextTurn: () =>
-    set(({ players, turn }) => {
-      const n = players.length
-      return { turn: turn < n - 1 ? turn + 1 : 0 }
-    }),
-  endGame: () => set({ deck: null }),
-}))
-*/
+module.exports = selector => selector({ ...state, ...mutator })

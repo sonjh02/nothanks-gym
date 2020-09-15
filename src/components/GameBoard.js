@@ -88,7 +88,8 @@ export default () => {
           if (!coin) {
             coin = ''
           }
-          hand.sort()
+          hand = hand.map(h => h * 1)
+          hand.sort((a1, a2) => a1 - a2)
           const handChips = []
           if (hand.length > 0) {
             handChips.push([hand[0]])
